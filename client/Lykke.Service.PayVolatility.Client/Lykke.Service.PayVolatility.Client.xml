@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Lykke.Service.PayVolatility.Client</name>
+    </assembly>
+    <members>
+        <member name="M:Lykke.Service.PayVolatility.Client.AutofacExtension.RegisterPayVolatilityClient(Autofac.ContainerBuilder,Lykke.Service.PayVolatility.Client.PayVolatilityServiceClientSettings,System.Func{Lykke.HttpClientGenerator.HttpClientGeneratorBuilder,Lykke.HttpClientGenerator.HttpClientGeneratorBuilder})">
+            <summary>
+            Registers <see cref="T:Lykke.Service.PayVolatility.Client.IPayVolatilityClient"/> in Autofac container using <see cref="T:Lykke.Service.PayVolatility.Client.PayVolatilityServiceClientSettings"/>.
+            </summary>
+            <param name="builder">Autofac container builder.</param>
+            <param name="settings">PayVolatility client settings.</param>
+            <param name="builderConfigure">Optional <see cref="T:Lykke.HttpClientGenerator.HttpClientGeneratorBuilder"/> configure handler.</param>
+        </member>
+        <member name="T:Lykke.Service.PayVolatility.Client.IPayVolatilityClient">
+            <summary>
+            PayVolatility client interface.
+            </summary>
+        </member>
+        <member name="T:Lykke.Service.PayVolatility.Client.PayVolatilityServiceClientSettings">
+            <summary>
+            PayVolatility client settings.
+            </summary>
+        </member>
+        <member name="P:Lykke.Service.PayVolatility.Client.PayVolatilityServiceClientSettings.ServiceUrl">
+            <summary>Service url.</summary>
+        </member>
+    </members>
+</doc>
