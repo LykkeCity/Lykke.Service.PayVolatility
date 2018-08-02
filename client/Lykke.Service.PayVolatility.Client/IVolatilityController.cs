@@ -1,21 +1,14 @@
-﻿using System;
+﻿using Lykke.Service.PayVolatility.Models;
+using Refit;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Lykke.HttpClientGenerator;
-using Lykke.Service.PayVolatility.Models;
 
 namespace Lykke.Service.PayVolatility.Client
 {
-    public class PayVolatilityClient : IPayVolatilityClient
+    public interface IVolatilityController
     {
-        public IVolatilityController VolatilityController { get; }
-        
-        public PayVolatilityClient(IHttpClientGenerator httpClientGenerator)
-        {
-            VolatilityController = httpClientGenerator.Generate<IVolatilityController>();
-        }
-
         /// <summary>
         /// Returns volatilities of the specified date.
         /// </summary>
@@ -24,11 +17,9 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatilities.</returns>
         /// <returns code="404">Volatilities for specified date is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(DateTime date,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return VolatilityController.GetDailyVolatilities(date, cancellationToken);
-        }
+        [Get("/api/Volatility/GetDailyVolatilities/")]
+        Task<IEnumerable<VolatilityModel>> GetDailyVolatilities(DateTime date,
+            CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Returns volatility.
@@ -39,10 +30,8 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatility.</returns>
         /// <returns code="404">Volatility is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<VolatilityModel> GetDailyVolatilityAsync(DateTime date, string assetPairId,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return VolatilityController.GetDailyVolatility(date, assetPairId, cancellationToken);
-        }
+        [Get("/api/Volatility/GetDailyVolatility/")]
+        Task<VolatilityModel> GetDailyVolatility(DateTime date, string assetPairId,
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

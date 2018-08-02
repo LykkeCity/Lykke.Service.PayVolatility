@@ -23,6 +23,9 @@
     <None Remove="Lykke.Service.PayVolatility.Client.xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\Lykke.Service.PayVolatility\Models\VolatilityModel.cs" Link="Models\VolatilityModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Lykke.Common" Version="7.0.1" />
     <PackageReference Include="Lykke.HttpClientGenerator" Version="2.1.0" />
     <PackageReference Include="Lykke.SettingsReader" Version="2.4.1" />

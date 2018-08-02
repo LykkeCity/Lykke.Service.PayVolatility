@@ -6,5 +6,12 @@ namespace Lykke.Service.PayVolatility.Settings
     {
         [AzureTableCheck]
         public string LogsConnString { get; set; }
+
+        [AzureTableCheck]
+        public string DataConnString { get; set; }
+
+        public string CandlesTableName { get; set; }
+
+        public string VolatilityTableName { get; set; }
     }
 }

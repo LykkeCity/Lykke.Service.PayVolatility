@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Lykke.Service.PayVolatility.Core.Settings;
 using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.PayVolatility.Settings
@@ -7,5 +8,11 @@ namespace Lykke.Service.PayVolatility.Settings
     public class PayVolatilitySettings
     {
         public DbSettings Db { get; set; }
+
+        public CandlesSubscriberSettings CandlesSubscriber { get; set; }
+
+        public VolatilityServiceSettings VolatilityService { get; set; }
+
+        public string[] AssetPairs { get; set; }
     }
 }

@@ -3,8 +3,29 @@
   {
     "Db":
     {
-      "LogsConnString": "${LogsConnString}:[AzureTableStorage]"
-    }
+      "LogsConnString": "${LogsConnString}:[AzureTableStorage]",
+      "DataConnString": "${PayVolatilityService-DataConnString}:[AzureTableStorage]",
+      "CandlesTableName": "Candles",
+      "VolatilityTableName": "Volatility"
+    },
+    "TickPriceSubscriber":
+    {
+      "ConnectionString": "${GeneralRabbitMqConnectionString}:[RabbitMq]",
+      "ExchangeName": "${PayVolatilityService-TickPriceSubscriber-ExchangeName}",
+      "QueueName": "${PayVolatilityService-TickPriceSubscriber-QueueName}"
+    },
+    "CandlesSubscriber": {
+      "ConnectionString": "${GeneralRabbitMqConnectionString}:[RabbitMq]",
+      "ExchangeName": "${lykke-candles-ExchangeName}",
+      "QueueName": "${PayVolatilityService-CandlesSubscriber-QueueName}",
+      "PriceType": "Mid",
+      "TimeInterval": "Minute"
+    },
+    "VolatilityService": {
+      "MultiplierFactor": ${PayVolatilityService-MultiplierFactor},
+      "CalculateTime": "${PayVolatilityService-CalculateTime}" 
+    },
+    "AssetPairs": ${PayVolatilityService-AssetPairs}:[JsonArray]
   },
   "MonitoringServiceClient": 
   {
