@@ -3,6 +3,7 @@ using Lykke.AzureStorage.Tables.Entity.Annotation;
 using Lykke.AzureStorage.Tables.Entity.ValueTypesMerging;
 using Lykke.Service.PayVolatility.Core.Domain;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
@@ -10,9 +11,14 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
     [ValueTypeMergingStrategy(ValueTypeMergingStrategy.UpdateIfDirty)]
     public class CandleEntity : AzureTableEntity, ICandle
     {
+        private const string TimestampFormat = "yyyy-MM-dd HH:mm";
+
         public string AssetPairId => PartitionKey.Split("_").First();
 
-        public DateTime CandleTimestamp => DateTime.Parse(RowKey);
+        public DateTime CandleTimestamp => DateTime.ParseExact(RowKey,
+            TimestampFormat,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None);
 
         private decimal _open;
         public decimal Open
@@ -84,7 +90,7 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
 
         internal static string GetRowKey(DateTime candleTimestamp)
         {
-            return candleTimestamp.ToString("s");
+            return candleTimestamp.ToString(TimestampFormat);
         }
     }
 }

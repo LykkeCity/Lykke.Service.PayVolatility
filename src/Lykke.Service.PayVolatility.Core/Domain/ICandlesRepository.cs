@@ -8,6 +8,6 @@ namespace Lykke.Service.PayVolatility.Core.Domain
     {
         Task<IEnumerable<ICandle>> GetAsync(string assetPairId, DateTime candleTimestamp);
         Task DeleteAsync(IEnumerable<ICandle> candles);
-        Task InsertAsync(ICandle candle);
+        Task AddAsync(ICandle candle);
     }
 }

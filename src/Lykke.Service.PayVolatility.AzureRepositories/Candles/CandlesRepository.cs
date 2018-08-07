@@ -26,9 +26,21 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
             return _storage.DeleteAsync(candles.Select(c => new CandleEntity(c) {ETag = "*"}));
         }
 
-        public Task InsertAsync(ICandle candle)
+        public Task AddAsync(ICandle candle)
         {
-            return _storage.InsertOrMergeAsync(new CandleEntity(candle));
+            return _storage.InsertOrModifyAsync(
+                CandleEntity.GetPartitionKey(candle.AssetPairId, candle.CandleTimestamp),
+                CandleEntity.GetRowKey(candle.CandleTimestamp),
+                () => new CandleEntity(candle),
+                c =>
+                {
+                    if (c.Low > candle.Low)
+                        c.Low = candle.Low;
+                    if (c.High < candle.High)
+                        c.High = candle.High;
+                    c.Close = candle.Close;
+                    return true;
+                });
         }
     }
 }

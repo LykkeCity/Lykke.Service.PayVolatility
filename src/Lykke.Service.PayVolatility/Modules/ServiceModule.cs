@@ -49,12 +49,12 @@ namespace Lykke.Service.PayVolatility.Modules
                 .As<IVolatilityRepository>()
                 .SingleInstance();
 
-            builder.RegisterType<CandlesSubscriber>()
+            builder.RegisterType<TickPricesSubscriber>()
                 .As<IStartable>()
                 .As<IStopable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter("settings", _appSettings.CurrentValue.PayVolatilityService.CandlesSubscriber)
+                .WithParameter("settings", _appSettings.CurrentValue.PayVolatilityService.TickPricesSubscriber)
                 .WithParameter("assetPairs", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
 
             builder.RegisterType<VolatilityCalculator>()

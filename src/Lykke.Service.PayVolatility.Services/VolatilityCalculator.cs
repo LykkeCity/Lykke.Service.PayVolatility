@@ -120,7 +120,6 @@ namespace Lykke.Service.PayVolatility.Services
             catch (Exception ex)
             {
                 _log.Error(ex, $"Fail processing {assetPair} {date.ToString("yyyy-MM-dd")}.");
-                throw;
             }
 
             return true;
@@ -130,13 +129,13 @@ namespace Lykke.Service.PayVolatility.Services
         {
             var closePriceChanges = new List<double>();
             var highPriceChanges = new List<double>();
-            for (var i = ChangesGap; i < candles.Length - 1; i++)
+            for (int i = ChangesGap; i < candles.Length - 1; i++)
             {
                 var baseIndex = i - ChangesGap;
                 var baseCandle = candles[baseIndex];
                 var candle = candles[i];
-                var closePriceChange = candle.Close / baseCandle.Close - 1;
-                var highPriceChange = candle.High / baseCandle.High - 1;
+                decimal closePriceChange = candle.Close / baseCandle.Close - 1;
+                decimal highPriceChange = candle.High / baseCandle.High - 1;
                 closePriceChanges.Add((double)closePriceChange);
                 highPriceChanges.Add((double)highPriceChange);
             }

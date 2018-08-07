@@ -9,7 +9,7 @@ namespace Lykke.Service.PayVolatility.Settings
     {
         public DbSettings Db { get; set; }
 
-        public CandlesSubscriberSettings CandlesSubscriber { get; set; }
+        public RabbitMqSubscriberSettings TickPricesSubscriber { get; set; }
 
         public VolatilityServiceSettings VolatilityService { get; set; }
 
