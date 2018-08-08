@@ -10,7 +10,11 @@ namespace Lykke.Service.PayVolatility.Core.Domain
 
         decimal Open { get; }
 
+        DateTime OpenTimestamp { get; set; }
+
         decimal Close { get; }
+
+        DateTime CloseTimestamp { get; set; }
 
         decimal High { get; }
 

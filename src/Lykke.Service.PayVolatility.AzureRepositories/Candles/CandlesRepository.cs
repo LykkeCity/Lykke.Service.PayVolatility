@@ -35,10 +35,27 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
                 c =>
                 {
                     if (c.Low > candle.Low)
+                    {
                         c.Low = candle.Low;
+                    }
+
                     if (c.High < candle.High)
+                    {
                         c.High = candle.High;
-                    c.Close = candle.Close;
+                    }
+
+                    if (c.CloseTimestamp < candle.CloseTimestamp)
+                    {
+                        c.Close = candle.Close;
+                        c.CloseTimestamp = candle.CloseTimestamp;
+                    }
+
+                    if (c.OpenTimestamp > candle.OpenTimestamp)
+                    {
+                        c.Open = candle.Open;
+                        c.OpenTimestamp = candle.OpenTimestamp;
+                    }
+
                     return true;
                 });
         }

@@ -15,7 +15,7 @@ namespace Lykke.Service.PayVolatility.Services
 {
     public class VolatilityCalculator: IStartable, IStopable
     {
-        private const int CheckAndProcessPreviousDatesMinutesDelay = 5;
+        private const int CheckAndProcessPreviousDatesMinutesDelay = 1;
         private const int ChangesGap = 10;
         private readonly IVolatilityRepository _volatilityRepository;
         private readonly ICandlesRepository _candlesRepository;
@@ -106,7 +106,7 @@ namespace Lykke.Service.PayVolatility.Services
 
             try
             {
-                var candles = (await _candlesRepository.GetAsync(assetPair, date)).ToArray();
+                var candles = (await _candlesRepository.GetAsync(assetPair, date)).OrderBy(c=>c.CandleTimestamp).ToArray();
                 if (!candles.Any())
                 {
                     return false;
@@ -129,7 +129,7 @@ namespace Lykke.Service.PayVolatility.Services
         {
             var closePriceChanges = new List<double>();
             var highPriceChanges = new List<double>();
-            for (int i = ChangesGap; i < candles.Length - 1; i++)
+            for (int i = ChangesGap; i < candles.Length; i++)
             {
                 var baseIndex = i - ChangesGap;
                 var baseCandle = candles[baseIndex];

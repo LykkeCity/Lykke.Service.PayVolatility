@@ -31,6 +31,17 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
             }
         }
 
+        private DateTime _openTimestamp;
+        public DateTime OpenTimestamp
+        {
+            get => _openTimestamp;
+            set
+            {
+                _openTimestamp = value;
+                MarkValueTypePropertyAsDirty(nameof(OpenTimestamp));
+            }
+        }
+
         private decimal _close;
         public decimal Close
         {
@@ -39,6 +50,17 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
             {
                 _close = value;
                 MarkValueTypePropertyAsDirty(nameof(Close));
+            }
+        }
+
+        private DateTime _closeTimestamp;
+        public DateTime CloseTimestamp
+        {
+            get => _closeTimestamp;
+            set
+            {
+                _closeTimestamp = value;
+                MarkValueTypePropertyAsDirty(nameof(CloseTimestamp));
             }
         }
 
@@ -73,7 +95,9 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
             PartitionKey = GetPartitionKey(candle.AssetPairId, candle.CandleTimestamp);
             RowKey = GetRowKey(candle.CandleTimestamp);
             Open = candle.Open;
+            OpenTimestamp = candle.OpenTimestamp;
             Close = candle.Close;
+            CloseTimestamp = candle.CloseTimestamp;
             High = candle.High;
             Low = candle.Low;
         }
