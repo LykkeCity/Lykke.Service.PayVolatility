@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Common.Log;
+using Lykke.Common.Api.Contract.Responses;
 using Lykke.Common.Log;
 using Lykke.Service.PayVolatility.Core.Services;
 using Lykke.Service.PayVolatility.Models;
+using LykkePay.Common.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -11,13 +13,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Lykke.Common.Api.Contract.Responses;
-using Lykke.Service.PayVolatility.Filters;
-using LykkePay.Common.Validation;
 
 namespace Lykke.Service.PayVolatility.Controllers
 {
-    [ServiceFilter(typeof(ValidateActionParametersFilterAttribute))]
     [Route("api/[controller]/[action]")]
     public class VolatilityController : Controller
     {
@@ -74,7 +72,7 @@ namespace Lykke.Service.PayVolatility.Controllers
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
         public async Task<IActionResult> GetDailyVolatility(DateTime date, 
-            [Required]string assetPairId)
+            [Required, RowKey]string assetPairId)
         {
             var volatility = await _volatilityService.GetAsync(date, assetPairId);
 

@@ -26,7 +26,7 @@
     <PackageReference Include="Lykke.Common.ExchangeAdapter" Version="3.5.0" />
     <PackageReference Include="Lykke.RabbitMqBroker" Version="7.1.0" />
     <PackageReference Include="Lykke.Sdk" Version="4.1.1" />
-    <PackageReference Include="LykkePay.Common" Version="1.0.1" />
+    <PackageReference Include="LykkePay.Common" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
   </ItemGroup>

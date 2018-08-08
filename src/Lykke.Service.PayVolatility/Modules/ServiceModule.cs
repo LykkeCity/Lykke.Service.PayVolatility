@@ -3,19 +3,17 @@ using AutoMapper;
 using AzureStorage.Tables;
 using Common;
 using Lykke.Common.Log;
-using Lykke.Sdk;
 using Lykke.Service.PayVolatility.AzureRepositories.Candles;
 using Lykke.Service.PayVolatility.AzureRepositories.Volatility;
 using Lykke.Service.PayVolatility.Core.Domain;
 using Lykke.Service.PayVolatility.Core.Services;
-using Lykke.Service.PayVolatility.Filters;
 using Lykke.Service.PayVolatility.Rabbit;
 using Lykke.Service.PayVolatility.Services;
 using Lykke.Service.PayVolatility.Settings;
 using Lykke.SettingsReader;
 
 namespace Lykke.Service.PayVolatility.Modules
-{    
+{
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _appSettings;
@@ -68,8 +66,6 @@ namespace Lykke.Service.PayVolatility.Modules
             builder.RegisterType<VolatilityService>()
                 .As<IVolatilityService>()
                 .SingleInstance();
-
-            builder.RegisterType<ValidateActionParametersFilterAttribute>();
         }
     }
 }
