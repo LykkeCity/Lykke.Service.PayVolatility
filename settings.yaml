@@ -8,7 +8,7 @@ PayVolatilityService:
             types: [ AzureTableStorage ]
         CandlesTableName: Candles
         VolatilityTableName: Volatility
-    TickPriceSubscriber:
+    TickPricesSubscriber:
         ConnectionString: 
             settings-key: GeneralRabbitMqConnectionString
             types: [ RabbitMq ]
