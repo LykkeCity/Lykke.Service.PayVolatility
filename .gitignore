@@ -63,4 +63,4 @@ node_modules
 
 # Particular
 src/Lykke.Service.PayVolatility/PayVolatility.json
-src/client/Lykke.Service.PayVolatility.Client/Lykke.Service.PayVolatility.Client.xml
+client/Lykke.Service.PayVolatility.Client/Lykke.Service.PayVolatility.Client.xml
