@@ -13,12 +13,18 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
     {
         private const string TimestampFormat = "yyyy-MM-dd HH:mm";
 
-        public string AssetPairId => PartitionKey.Split("_").First();
+        public string AssetPairId { get; set; }
 
-        public DateTime CandleTimestamp => DateTime.ParseExact(RowKey,
-            TimestampFormat,
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.None);
+        private DateTime _candleTimestamp;
+        public DateTime CandleTimestamp
+        {
+            get => _candleTimestamp;
+            set
+            {
+                _candleTimestamp = value;
+                MarkValueTypePropertyAsDirty(nameof(CandleTimestamp));
+            }
+        }
 
         private decimal _open;
         public decimal Open
@@ -94,6 +100,8 @@ namespace Lykke.Service.PayVolatility.AzureRepositories.Candles
         {
             PartitionKey = GetPartitionKey(candle.AssetPairId, candle.CandleTimestamp);
             RowKey = GetRowKey(candle.CandleTimestamp);
+            AssetPairId = candle.AssetPairId;
+            CandleTimestamp = candle.CandleTimestamp;
             Open = candle.Open;
             OpenTimestamp = candle.OpenTimestamp;
             Close = candle.Close;
