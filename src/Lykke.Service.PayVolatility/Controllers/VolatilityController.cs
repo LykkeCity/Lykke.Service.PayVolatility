@@ -13,6 +13,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Lykke.Service.PayVolatility.Core.Domain;
+using Lykke.Service.PayVolatility.Core.Settings;
 
 namespace Lykke.Service.PayVolatility.Controllers
 {
@@ -20,13 +22,17 @@ namespace Lykke.Service.PayVolatility.Controllers
     public class VolatilityController : Controller
     {
         private readonly IVolatilityService _volatilityService;
+        private readonly VolatilityServiceSettings _volatilityServiceSettings;
         private readonly IMapper _mapper;
         private readonly ILog _log;
+        private readonly int CalculationDurationInMinutes = 10; 
 
         public VolatilityController(IVolatilityService volatilityService,
+            VolatilityServiceSettings volatilityServiceSettings,
             IMapper mapper, ILogFactory logFactory)
         {
             _volatilityService = volatilityService;
+            _volatilityServiceSettings = volatilityServiceSettings;
             _mapper = mapper;
             _log = logFactory.CreateLog(this);
         }
@@ -44,9 +50,22 @@ namespace Lykke.Service.PayVolatility.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
-        public async Task<IActionResult> GetDailyVolatilities(DateTime date)
+        public async Task<IActionResult> GetDailyVolatilities(DateTime? date = null)
         {
-            var volatilities = await _volatilityService.GetAsync(date);
+            IEnumerable<IVolatility> volatilities;
+            if (date.HasValue)
+            {
+                volatilities = await _volatilityService.GetAsync(date.Value);
+            }
+            else
+            {
+                DateTime lastDate = GetLastDate();
+                volatilities = await _volatilityService.GetAsync(lastDate);
+                if (!volatilities.Any())
+                {
+                    volatilities = await _volatilityService.GetAsync(lastDate.AddDays(-1));
+                }
+            }
 
             if (!volatilities.Any())
             {
@@ -71,10 +90,23 @@ namespace Lykke.Service.PayVolatility.Controllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), (int)HttpStatusCode.BadRequest)]
         [ValidateModel]
-        public async Task<IActionResult> GetDailyVolatility(DateTime date, 
+        public async Task<IActionResult> GetDailyVolatility(DateTime? date, 
             [Required, RowKey]string assetPairId)
         {
-            var volatility = await _volatilityService.GetAsync(date, assetPairId);
+            IVolatility volatility;
+            if (date.HasValue)
+            {
+                volatility= await _volatilityService.GetAsync(date.Value, assetPairId);
+            }
+            else
+            {
+                DateTime lastDate = GetLastDate();
+                volatility= await _volatilityService.GetAsync(lastDate, assetPairId);
+                if (volatility == null)
+                {
+                    volatility= await _volatilityService.GetAsync(lastDate.AddDays(-1), assetPairId);
+                }
+            }
 
             if (volatility == null)
             {
@@ -83,6 +115,21 @@ namespace Lykke.Service.PayVolatility.Controllers
 
             var models = _mapper.Map<VolatilityModel>(volatility);
             return Ok(models);
+        }
+
+        private DateTime GetLastDate()
+        {
+            var calculationTime = DateTime.UtcNow.Date.Add(_volatilityServiceSettings.CalculateTime.TimeOfDay)
+                .AddMinutes(CalculationDurationInMinutes);
+
+            if (DateTime.UtcNow > calculationTime)
+            {
+                return DateTime.UtcNow.Date.AddDays(-1);
+            }
+            else
+            {
+                return DateTime.UtcNow.Date.AddDays(-2);
+            }
         }
     }
 }

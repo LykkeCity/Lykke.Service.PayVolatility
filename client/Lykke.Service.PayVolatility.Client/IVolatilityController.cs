@@ -18,7 +18,7 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="404">Volatilities for specified date is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
         [Get("/api/Volatility/GetDailyVolatilities/")]
-        Task<IEnumerable<VolatilityModel>> GetDailyVolatilities(DateTime date,
+        Task<IEnumerable<VolatilityModel>> GetDailyVolatilities(DateTime? date,
             CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="404">Volatility is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
         [Get("/api/Volatility/GetDailyVolatility/")]
-        Task<VolatilityModel> GetDailyVolatility(DateTime date, string assetPairId,
+        Task<VolatilityModel> GetDailyVolatility(DateTime? date, string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lykke.HttpClientGenerator;
 using Lykke.Service.PayVolatility.Models;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Lykke.Service.PayVolatility.Client
 {
-    public class PayVolatilityClient : IPayVolatilityClient
+    public class CachedPayVolatilityClient : PayVolatilityClient
     {
-        public IVolatilityController VolatilityController { get; }
+        private const int CacheHours = 1;
+        private IMemoryCache _memoryCache;
         
-        public PayVolatilityClient(IHttpClientGenerator httpClientGenerator)
+        public CachedPayVolatilityClient(IHttpClientGenerator httpClientGenerator) : base(httpClientGenerator)
         {
-            VolatilityController = httpClientGenerator.Generate<IVolatilityController>();
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
         }
-
+        
         /// <summary>
         /// Returns volatilities of the specified date.
         /// </summary>
@@ -27,7 +30,8 @@ namespace Lykke.Service.PayVolatility.Client
         public Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(DateTime date,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return VolatilityController.GetDailyVolatilities(date, cancellationToken);
+            return GetCachedValue($"GetDailyVolatilitiesAsync_{date.ToString()}",
+                () => base.GetDailyVolatilitiesAsync(date, cancellationToken));
         }
         
         /// <summary>
@@ -40,7 +44,8 @@ namespace Lykke.Service.PayVolatility.Client
         public Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return VolatilityController.GetDailyVolatilities(null, cancellationToken);
+            return GetCachedValue($"GetDailyVolatilitiesAsync",
+                () => base.GetDailyVolatilitiesAsync(cancellationToken));
         }
 
         /// <summary>
@@ -55,12 +60,19 @@ namespace Lykke.Service.PayVolatility.Client
         public Task<VolatilityModel> GetDailyVolatilityAsync(DateTime date, string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return VolatilityController.GetDailyVolatility(date, assetPairId, cancellationToken);
+            return GetCachedValue($"GetDailyVolatilitiesAsync_{date.ToString()}",
+                async () =>
+                {
+                    var volatilities = await base.GetDailyVolatilitiesAsync(date, cancellationToken);
+                    return volatilities.FirstOrDefault(v =>
+                        string.Equals(v.AssetPairId, assetPairId, StringComparison.OrdinalIgnoreCase));
+                });
         }
         
         /// <summary>
         /// Returns volatility of the last day.
         /// </summary>
+        /// <param name="date">Date of volatility.</param>
         /// <param name="assetPairId">Identifier of the asset pair.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the work.</param>
         /// <returns code="200">Volatility.</returns>
@@ -69,7 +81,25 @@ namespace Lykke.Service.PayVolatility.Client
         public Task<VolatilityModel> GetDailyVolatilityAsync(string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return VolatilityController.GetDailyVolatility(null, assetPairId, cancellationToken);
+            return GetCachedValue($"GetDailyVolatilitiesAsync",
+                async () =>
+                {
+                    var volatilities = await base.GetDailyVolatilitiesAsync(cancellationToken);
+                    return volatilities.FirstOrDefault(v =>
+                        string.Equals(v.AssetPairId, assetPairId, StringComparison.OrdinalIgnoreCase));
+                });
+        }
+        
+        private async Task<T> GetCachedValue<T>(string key, Func<Task<T>> func) where T : class
+        {
+            T result = _memoryCache.Get<T>(key);
+            if (result == null)
+            {
+                result = await func();
+                _memoryCache.Set(key, result, TimeSpan.FromHours(CacheHours));
+            }
+
+            return result;
         }
     }
 }

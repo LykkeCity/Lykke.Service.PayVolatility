@@ -60,11 +60,14 @@ namespace Lykke.Service.PayVolatility.Modules
                 .As<IStopable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter("settings", _appSettings.CurrentValue.PayVolatilityService.VolatilityService)
                 .WithParameter("assetPairs", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
 
             builder.RegisterType<VolatilityService>()
                 .As<IVolatilityService>()
+                .SingleInstance();
+            
+            builder.RegisterInstance(_appSettings.CurrentValue.PayVolatilityService.VolatilityService)
+                .AsSelf()
                 .SingleInstance();
         }
     }
