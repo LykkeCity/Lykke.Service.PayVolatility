@@ -24,12 +24,12 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatilities.</returns>
         /// <returns code="404">Volatilities for specified date is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(DateTime date,
+        public virtual Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(DateTime date,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return VolatilityController.GetDailyVolatilities(date, cancellationToken);
         }
-        
+
         /// <summary>
         /// Returns volatilities of the last date.
         /// </summary>
@@ -37,7 +37,7 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatilities.</returns>
         /// <returns code="404">Volatilities for specified date is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(
+        public virtual Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return VolatilityController.GetDailyVolatilities(null, cancellationToken);
@@ -52,12 +52,12 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatility.</returns>
         /// <returns code="404">Volatility is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<VolatilityModel> GetDailyVolatilityAsync(DateTime date, string assetPairId,
+        public virtual Task<VolatilityModel> GetDailyVolatilityAsync(DateTime date, string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return VolatilityController.GetDailyVolatility(date, assetPairId, cancellationToken);
         }
-        
+
         /// <summary>
         /// Returns volatility of the last day.
         /// </summary>
@@ -66,7 +66,7 @@ namespace Lykke.Service.PayVolatility.Client
         /// <returns code="200">Volatility.</returns>
         /// <returns code="404">Volatility is not found.</returns>
         /// <returns code="400">Input arguments are invalid.</returns>
-        public Task<VolatilityModel> GetDailyVolatilityAsync(string assetPairId,
+        public virtual Task<VolatilityModel> GetDailyVolatilityAsync(string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             return VolatilityController.GetDailyVolatility(null, assetPairId, cancellationToken);
