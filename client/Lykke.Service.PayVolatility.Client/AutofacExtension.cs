@@ -52,6 +52,10 @@ namespace Lykke.Service.PayVolatility.Client
                 throw new ArgumentNullException(nameof(builder));
             if (settings == null)
                 throw new ArgumentNullException(nameof(settings));
+
+            if(settings.CachePeriod.HasValue && settings.ExpirationTimeUTC.HasValue)
+                throw new ArgumentException($"{nameof(settings.CachePeriod)} and {nameof(settings.ExpirationTimeUTC)} should not be specified together.");
+
             if (string.IsNullOrWhiteSpace(settings.ServiceUrl))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(PayVolatilityServiceClientSettings.ServiceUrl));
 
@@ -60,7 +64,7 @@ namespace Lykke.Service.PayVolatility.Client
 
             clientBuilder = builderConfigure?.Invoke(clientBuilder) ?? clientBuilder.WithoutRetries();
 
-            builder.RegisterInstance(new CachedPayVolatilityClient(clientBuilder.Create()))
+            builder.RegisterInstance(new CachedPayVolatilityClient(clientBuilder.Create(), settings))
                 .As<IPayVolatilityClient>()
                 .SingleInstance();
         }

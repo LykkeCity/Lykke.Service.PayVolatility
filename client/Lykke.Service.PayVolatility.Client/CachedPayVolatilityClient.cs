@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lykke.Common.Cache;
 using Lykke.HttpClientGenerator;
 using Lykke.Service.PayVolatility.Models;
 using Microsoft.Extensions.Caching.Memory;
@@ -12,11 +13,15 @@ namespace Lykke.Service.PayVolatility.Client
     public class CachedPayVolatilityClient : PayVolatilityClient
     {
         private const int CacheHours = 1;
-        private IMemoryCache _memoryCache;
-        
-        public CachedPayVolatilityClient(IHttpClientGenerator httpClientGenerator) : base(httpClientGenerator)
+        private OnDemandDataCache<IEnumerable<VolatilityModel>> _memoryCache;
+        private IPayVolatilityServiceClientCacheSettings _settings;
+
+
+        public CachedPayVolatilityClient(IHttpClientGenerator httpClientGenerator, 
+            IPayVolatilityServiceClientCacheSettings settings) : base(httpClientGenerator)
         {
-            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+            _memoryCache = new OnDemandDataCache<IEnumerable<VolatilityModel>>();
+            _settings = settings;
         }
         
         /// <summary>
@@ -30,7 +35,7 @@ namespace Lykke.Service.PayVolatility.Client
         public override Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(DateTime date,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetCachedValue($"GetDailyVolatilitiesAsync_{date.ToString()}",
+            return GetCachedValueAsync($"GetDailyVolatilitiesAsync_{date.ToString("yyyy-MM-dd")}",
                 () => base.GetDailyVolatilitiesAsync(date, cancellationToken));
         }
         
@@ -44,7 +49,7 @@ namespace Lykke.Service.PayVolatility.Client
         public override Task<IEnumerable<VolatilityModel>> GetDailyVolatilitiesAsync(
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return GetCachedValue($"GetDailyVolatilitiesAsync",
+            return GetCachedValueAsync("GetDailyVolatilitiesAsync",
                 () => base.GetDailyVolatilitiesAsync(cancellationToken));
         }
 
@@ -79,16 +84,24 @@ namespace Lykke.Service.PayVolatility.Client
                 string.Equals(v.AssetPairId, assetPairId, StringComparison.OrdinalIgnoreCase));
         }
         
-        private async Task<T> GetCachedValue<T>(string key, Func<Task<T>> func) where T : class
+        private Task<IEnumerable<VolatilityModel>> GetCachedValueAsync(string key, Func<Task<IEnumerable<VolatilityModel>>> factory)
         {
-            T result = _memoryCache.Get<T>(key);
-            if (result == null)
+            if (_settings.ExpirationTimeUTC.HasValue)
             {
-                result = await func();
-                _memoryCache.Set(key, result, TimeSpan.FromHours(CacheHours));
+                DateTimeOffset expiration = DateTime.UtcNow.Date.Add(_settings.ExpirationTimeUTC.Value.TimeOfDay);
+                if (expiration <= DateTime.UtcNow)
+                {
+                    expiration = expiration.AddDays(1);
+                }
+                return _memoryCache.GetOrAddAsync(key, k=> factory(), expiration);
             }
 
-            return result;
+            if (_settings.CachePeriod.HasValue)
+            {
+                return _memoryCache.GetOrAddAsync(key, k => factory(), _settings.CachePeriod.Value);
+            }
+
+            return _memoryCache.GetOrAddAsync(key, k => factory(), TimeSpan.FromHours(CacheHours));
         }
     }
 }
