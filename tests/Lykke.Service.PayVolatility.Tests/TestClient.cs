@@ -11,13 +11,13 @@ namespace Lykke.Service.PayVolatility.Tests
         //[Fact]
         //public async Task Test1()
         //{
-        //    var clientBuilder = HttpClientGenerator.HttpClientGenerator.BuildForUrl("http://localhost:5000")
+        //    var clientBuilder = HttpClientGenerator.HttpClientGenerator.BuildForUrl("http://pay-volatility.lykke-service.svc.cluster.local")
         //        .WithAdditionalCallsWrapper(new ExceptionHandlerCallsWrapper());
 
         //    clientBuilder = clientBuilder.WithoutRetries();
 
-        //    var client = new PayVolatilityClient(clientBuilder.Create());
-        //    var result = await client.GetDailyVolatilities(new DateTime(2018, 7, 31));
+        //    var client = new CachedPayVolatilityClient(clientBuilder.Create(), new PayVolatilityServiceClientSettings(){ExpirationTimeUTC = DateTime.UtcNow.AddHours(1)});
+        //    var result = await client.GetDailyVolatilitiesAsync(new DateTime(2018, 7, 31));
         //}
     }
 }
