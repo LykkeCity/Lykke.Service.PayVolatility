@@ -16,8 +16,9 @@ namespace Lykke.Service.PayVolatility.Tests
 
         //    clientBuilder = clientBuilder.WithoutRetries();
 
-        //    var client = new CachedPayVolatilityClient(clientBuilder.Create(), new PayVolatilityServiceClientSettings(){ExpirationTimeUTC = DateTime.UtcNow.AddHours(1)});
-        //    var result = await client.GetDailyVolatilitiesAsync(new DateTime(2018, 7, 31));
+        //    var client = new CachedPayVolatilityClient(clientBuilder.Create(), new PayVolatilityServiceClientSettings() { ExpirationTimeUTC = DateTime.UtcNow.AddHours(1) });
+        //    var result1 = await client.Volatility.GetDailyVolatilitiesAsync(new DateTime(2018, 7, 31));
+        //    var result2 = await client.Volatility.GetDailyVolatilitiesAsync();
         //}
     }
 }
