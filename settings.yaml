@@ -1,16 +1,16 @@
 PayVolatilityService: 
     Db:
         LogsConnString:
-            settings-key: PayVolatilityService-LogsConnString
+            settings-key: LykkePayLogsConnString
             types: [ AzureTableStorage ]
         DataConnString: 
-            settings-key: PayVolatilityService-DataConnString
+            settings-key: LykkePayMerchantDataConnString
             types: [ AzureTableStorage ]
         CandlesTableName: Candles
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
-            settings-key: GeneralRabbitMqConnectionString
+            settings-key: RabbitPay
             types: [ RabbitMq ]
         ExchangeName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-ExchangeName
