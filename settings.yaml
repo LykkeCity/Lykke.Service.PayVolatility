@@ -2,32 +2,37 @@ PayVolatilityService:
     Db:
         LogsConnString:
             settings-key: LykkePayLogsConnString
-            types: [ AzureTableStorage ]
+            types: [ AzureTableStorage, Tag ]
         DataConnString: 
             settings-key: LykkePayMerchantDataConnString
-            types: [ AzureTableStorage ]
+            types: [ AzureTableStorage, Tag ]
         CandlesTableName: Candles
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
             settings-key: RabbitRawExchanges
-            types: [ RabbitMq ]
+            types: [ RabbitMq, Tag ]
         ExchangeName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-ExchangeName
+            types: [ Tag ]
         QueueName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
+            types: [ Tag ]
     VolatilityService:
         MultiplierFactor:
             settings-key: PayVolatilityService-MultiplierFactor
+            types: [ Tag ]
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
+            types: [ Tag ]
     AssetPairs: 
         settings-key: PayVolatilityService-AssetPairs
-        types: [ JsonArray ]
+        types: [ JsonArray, Tag ]
 
 MonitoringServiceClient:
   MonitoringServiceUrl:
     settings-key: MonitoringServiceUrl
+    types: [ Tag ]
 
 SlackNotifications:
   AzureQueue:
