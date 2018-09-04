@@ -1,44 +1,39 @@
-PayVolatilityService:
+PayVolatilityService: 
     Db:
         LogsConnString:
             settings-key: LykkePayLogsConnString
-            types: [ AzureTableStorage, Tag ]
+            types: [ AzureTableStorage ]
         DataConnString: 
-            settings-key: LykkePayMerchantDataConnString
-            types: [ AzureTableStorage, Tag ]
-        CandlesTableName: Candles
+            settings-key: LykkePayDataConnString
+            types: [ AzureTableStorage ]
+        CandlesTableName: VolatilityCandles
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
             settings-key: RabbitRawExchanges
-            types: [ RabbitMq, Tag ]
+            types: [ RabbitMq ]
         ExchangeName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-ExchangeName
-            types: [ Tag ]
         QueueName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
-            types: [ Tag ]
     VolatilityService:
         MultiplierFactor:
             settings-key: PayVolatilityService-MultiplierFactor
-            types: [ Tag ]
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
-            types: [ Tag ]
     AssetPairs: 
         settings-key: PayVolatilityService-AssetPairs
-        types: [ JsonArray, Tag ]
+        types: [ JsonArray ]
 
 MonitoringServiceClient:
-    MonitoringServiceUrl:
-        settings-key: MonitoringServiceUrl
-        types: [ Tag ]
+  MonitoringServiceUrl:
+    settings-key: MonitoringServiceUrl
 
 SlackNotifications:
-    AzureQueue:
-        ConnectionString:
-            settings-key: SlackNotificationsConnString
-            types: [ AzureTableStorage ]
-        QueueName:
-            settings-key: SlackQueueName
-            types: [ AzureTableStorage ]
+  AzureQueue:
+    ConnectionString:
+      settings-key: SlackNotificationsConnString
+      types: [ AzureTableStorage ]
+    QueueName:
+      settings-key: SlackQueueName
+      types: [ AzureTableStorage ]
