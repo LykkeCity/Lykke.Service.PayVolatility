@@ -1,4 +1,4 @@
-PayVolatilityService: 
+PayVolatilityService:
     Db:
         LogsConnString:
             settings-key: LykkePayLogsConnString
@@ -30,9 +30,9 @@ PayVolatilityService:
         types: [ JsonArray, Tag ]
 
 MonitoringServiceClient:
-  MonitoringServiceUrl:
-    settings-key: MonitoringServiceUrl
-    types: [ Tag ]
+    MonitoringServiceUrl:
+        settings-key: MonitoringServiceUrl
+        types: [ Tag ]
 
 SlackNotifications:
   AzureQueue:
