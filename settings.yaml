@@ -35,10 +35,10 @@ MonitoringServiceClient:
         types: [ Tag ]
 
 SlackNotifications:
-  AzureQueue:
-    ConnectionString:
-      settings-key: SlackNotificationsConnString
-      types: [ AzureTableStorage ]
-    QueueName:
-      settings-key: SlackQueueName
-      types: [ AzureTableStorage ]
+    AzureQueue:
+        ConnectionString:
+            settings-key: SlackNotificationsConnString
+            types: [ AzureTableStorage ]
+        QueueName:
+            settings-key: SlackQueueName
+            types: [ AzureTableStorage ]
