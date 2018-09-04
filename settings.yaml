@@ -1,12 +1,12 @@
 PayVolatilityService: 
     Db:
         LogsConnString:
-            settings-key: PayVolatilityService-LogsConnString
+            settings-key: LykkePayLogsConnString
             types: [ AzureTableStorage ]
         DataConnString: 
-            settings-key: PayVolatilityService-DataConnString
+            settings-key: LykkePayDataConnString
             types: [ AzureTableStorage ]
-        CandlesTableName: Candles
+        CandlesTableName: VolatilityCandles
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
