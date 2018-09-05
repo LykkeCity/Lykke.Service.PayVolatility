@@ -81,7 +81,8 @@ namespace Lykke.Service.PayVolatility.Services
             }
             _log.Info($"Finish processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
-            if (!completedDate)
+            DateTime previousDate = date.AddDays(-1);
+            if (!completedDate && previousDate >= DateTime.UtcNow.Date.AddDays(-_settings.ProcessingHistoryDepthDays))
             {
                 await CheckAndProcessPreviousDates(date.AddDays(-1));
             }
