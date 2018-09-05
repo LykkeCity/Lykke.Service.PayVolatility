@@ -66,7 +66,6 @@ namespace Lykke.Service.PayVolatility.Services
             _log.Info($"Start processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
             var volatilities = (await _volatilityRepository.GetAsync(date)).ToArray();
-            bool completedDate = true;
             foreach (string assetPair in _assetPairs)
             {
                 if (volatilities.Select(v => v.AssetPairId).Contains(assetPair, StringComparer.OrdinalIgnoreCase))
@@ -74,18 +73,14 @@ namespace Lykke.Service.PayVolatility.Services
                     continue;
                 }
 
-                bool processed = await ProcessAsync(assetPair, date);
-                if (!processed)
-                {
-                    completedDate = false;
-                }
+                await ProcessAsync(assetPair, date);
             }
             _log.Info($"Finish processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
             DateTime previousDate = date.AddDays(-1);
-            if (!completedDate && previousDate >= DateTime.UtcNow.Date.AddDays(-_settings.ProcessingHistoryDepthDays))
+            if (previousDate >= DateTime.UtcNow.Date.AddDays(-_settings.ProcessingHistoryDepthDays))
             {
-                await CheckAndProcessPreviousDates(date.AddDays(-1));
+                await CheckAndProcessPreviousDates(previousDate);
             }
         }
 
