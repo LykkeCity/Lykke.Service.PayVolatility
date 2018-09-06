@@ -17,6 +17,7 @@ namespace Lykke.Service.PayVolatility.Services
     {
         private const int CheckAndProcessPreviousDatesMinutesDelay = 1;
         private const int ChangesGap = 10;
+        private const int MinDeviationCount = 2;
         private readonly IVolatilityRepository _volatilityRepository;
         private readonly ICandlesRepository _candlesRepository;
         private readonly VolatilityServiceSettings _settings;
@@ -65,7 +66,6 @@ namespace Lykke.Service.PayVolatility.Services
             _log.Info($"Start processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
             var volatilities = (await _volatilityRepository.GetAsync(date)).ToArray();
-            bool completedDate = true;
             foreach (string assetPair in _assetPairs)
             {
                 if (volatilities.Select(v => v.AssetPairId).Contains(assetPair, StringComparer.OrdinalIgnoreCase))
@@ -73,17 +73,14 @@ namespace Lykke.Service.PayVolatility.Services
                     continue;
                 }
 
-                bool processed = await ProcessAsync(assetPair, date);
-                if (!processed)
-                {
-                    completedDate = false;
-                }
+                await ProcessAsync(assetPair, date);
             }
             _log.Info($"Finish processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
-            if (!completedDate)
+            DateTime previousDate = date.AddDays(-1);
+            if (previousDate >= DateTime.UtcNow.Date.AddDays(-_settings.ProcessingHistoryDepthDays))
             {
-                await CheckAndProcessPreviousDates(date.AddDays(-1));
+                await CheckAndProcessPreviousDates(previousDate);
             }
         }
 
@@ -107,8 +104,15 @@ namespace Lykke.Service.PayVolatility.Services
             try
             {
                 var candles = (await _candlesRepository.GetAsync(assetPair, date)).OrderBy(c=>c.CandleTimestamp).ToArray();
+
                 if (!candles.Any())
                 {
+                    return false;
+                }
+
+                if (candles.Length < ChangesGap + MinDeviationCount)
+                {
+                    _log.Info($"Not enought candles to process {assetPair} on {date.ToString("yyyy-MM-dd")}.");
                     return false;
                 }
 
