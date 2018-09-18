@@ -64,8 +64,10 @@ namespace Lykke.Service.PayVolatility.Client
         public async Task<VolatilityModel> GetDailyVolatilityAsync(DateTime date, string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (await GetDailyVolatilitiesAsync(date, cancellationToken)).FirstOrDefault(v =>
-                string.Equals(v.AssetPairId, assetPairId, StringComparison.OrdinalIgnoreCase));
+            return (await GetCachedValueAsync($"GetDailyVolatilityAsync_{date.ToString("yyyy-MM-dd")}_{assetPairId}",
+                    async () => new[]
+                        {await _volatilityController.GetDailyVolatilityAsync(date, assetPairId, cancellationToken)}))
+                .FirstOrDefault();
         }
 
         /// <summary>
@@ -79,8 +81,10 @@ namespace Lykke.Service.PayVolatility.Client
         public async Task<VolatilityModel> GetDailyVolatilityAsync(string assetPairId,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            return (await GetDailyVolatilitiesAsync(cancellationToken)).FirstOrDefault(v =>
-                string.Equals(v.AssetPairId, assetPairId, StringComparison.OrdinalIgnoreCase));
+            return (await GetCachedValueAsync($"GetDailyVolatilityAsync_{assetPairId}",
+                    async () => new[]
+                        {await _volatilityController.GetDailyVolatilityAsync(assetPairId, cancellationToken)}))
+                .FirstOrDefault();
         }
 
         private Task<IEnumerable<VolatilityModel>> GetCachedValueAsync(string key, Func<Task<IEnumerable<VolatilityModel>>> factory)
