@@ -74,19 +74,10 @@ namespace Lykke.Service.PayVolatility.Rabbit
 
         private Task ProcessMessageAsync(TickPrice tickPrice)
         {
-            try
-            {
-                if (!_assetPairs.Contains(tickPrice.Asset, StringComparer.OrdinalIgnoreCase))
-                    return Task.CompletedTask;
+            if(!_assetPairs.Contains(tickPrice.Asset, StringComparer.OrdinalIgnoreCase))
+                return Task.CompletedTask;
 
-                return _candlesRepository.AddAsync(new Candle(tickPrice));
-            }
-            catch (Exception ex)
-            {
-                _log.Error(ex);
-                throw;
-            }
+            return _candlesRepository.AddAsync(new Candle(tickPrice));
         }
     }
 }
-
