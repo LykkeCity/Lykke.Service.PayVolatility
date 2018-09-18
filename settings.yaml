@@ -20,7 +20,7 @@ PayVolatilityService:
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
     AssetPairs: 
-        settings-key: PayVolatilityService-AssetPairs
+        settings-key: PayVolatilityService-AssetPairsWithMultiplierFactor
         types: [ JsonArray ]
 
 AssetService:  
