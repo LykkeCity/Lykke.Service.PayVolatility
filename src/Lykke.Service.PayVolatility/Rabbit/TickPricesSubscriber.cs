@@ -10,6 +10,7 @@ using Lykke.RabbitMqBroker;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.PayVolatility.Core.Domain;
+using Lykke.Service.PayVolatility.Core.Settings;
 using Lykke.Service.PayVolatility.Settings;
 
 namespace Lykke.Service.PayVolatility.Rabbit
@@ -25,13 +26,13 @@ namespace Lykke.Service.PayVolatility.Rabbit
 
         public TickPricesSubscriber(RabbitMqSubscriberSettings settings,
             ILogFactory logFactory, ICandlesRepository candlesRepository,
-            string[] assetPairs)
+            AssetPairSettings[] assetPairsSettings)
         {
             _logFactory = logFactory;
             _log = logFactory.CreateLog(this);
             _settings = settings;
             _candlesRepository = candlesRepository;
-            _assetPairs = assetPairs;
+            _assetPairs = assetPairsSettings.Select(p=>p.AssetPairId).ToArray();
         }
 
         public void Start()

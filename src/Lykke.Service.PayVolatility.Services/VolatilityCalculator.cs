@@ -3,6 +3,7 @@ using Common;
 using Common.Log;
 using Lykke.Common.Log;
 using Lykke.Service.PayVolatility.Core.Domain;
+using Lykke.Service.PayVolatility.Core.Services;
 using Lykke.Service.PayVolatility.Core.Settings;
 using MathNet.Numerics.Statistics;
 using System;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lykke.Service.Assets.Client.Models;
 
 namespace Lykke.Service.PayVolatility.Services
 {
@@ -19,27 +21,31 @@ namespace Lykke.Service.PayVolatility.Services
         private const int ChangesGap = 10;
         private const int MinDeviationCount = 2;
         private readonly IVolatilityRepository _volatilityRepository;
-        private readonly ICandlesRepository _candlesRepository;
+        private readonly ICandlesRepository _candlesRepository;        
+        private readonly ICachedAssetsService _cachedAssetsService;
+        private readonly AssetPairSettings[] _assetPairsSettings;
         private readonly VolatilityServiceSettings _settings;
-        private readonly string[] _assetPairs;
         private Timer _timer;
         private Timer _previousDatesTimer;
         private ILog _log;
 
         public VolatilityCalculator(ICandlesRepository candlesRepository,
-            IVolatilityRepository volatilityRepository,
-            VolatilityServiceSettings settings, 
-            string[] assetPairs, ILogFactory logFactory)
+            IVolatilityRepository volatilityRepository, ICachedAssetsService cachedAssetsService, 
+            AssetPairSettings[] assetPairsSettings, VolatilityServiceSettings settings,
+            ILogFactory logFactory)
         {
             _candlesRepository = candlesRepository;
-            _volatilityRepository = volatilityRepository;
+            _volatilityRepository = volatilityRepository;            
+            _cachedAssetsService = cachedAssetsService;
+            _assetPairsSettings = assetPairsSettings;
             _settings = settings;
-            _assetPairs = assetPairs;
             _log = logFactory.CreateLog(this);
         }
 
         public void Start()
-        {            
+        {
+            _cachedAssetsService.LoadAssetsAsync().GetAwaiter().GetResult();
+
             var calculateDateTime = DateTime.UtcNow.Date.Add(_settings.CalculateTime.TimeOfDay);
             if (DateTime.UtcNow.TimeOfDay >= _settings.CalculateTime.TimeOfDay)
             {
@@ -66,9 +72,10 @@ namespace Lykke.Service.PayVolatility.Services
             _log.Info($"Start processing previous date: {date.ToString("yyyy-MM-dd")}.");
 
             var volatilities = (await _volatilityRepository.GetAsync(date)).ToArray();
-            foreach (string assetPair in _assetPairs)
+            foreach (AssetPairSettings assetPair in _assetPairsSettings)
             {
-                if (volatilities.Select(v => v.AssetPairId).Contains(assetPair, StringComparer.OrdinalIgnoreCase))
+                if (volatilities.Select(v => v.AssetPairId).Contains(assetPair.AssetPairId, 
+                    StringComparer.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -86,24 +93,27 @@ namespace Lykke.Service.PayVolatility.Services
 
         private async Task ProcessAsync()
         {
+            await _cachedAssetsService.LoadAssetsAsync();
+
             DateTime yesterday = DateTime.UtcNow.Date.AddDays(-1);
 
             _log.Info($"Start processing yesterday: {yesterday.ToString("yyyy-MM-dd")}.");
 
-            foreach (string assetPair in _assetPairs)
+            foreach (AssetPairSettings assetPair in _assetPairsSettings)
             {
                 await ProcessAsync(assetPair, yesterday);
             }
             _log.Info($"Finish processing yesterday: {yesterday.ToString("yyyy-MM-dd")}.");
         }
 
-        private async Task<bool> ProcessAsync(string assetPair, DateTime date)
+        private async Task<bool> ProcessAsync(AssetPairSettings assetPair, DateTime date)
         {
             _log.Info($"Start processing {assetPair} {date.ToString("yyyy-MM-dd")}.");
 
             try
             {
-                var candles = (await _candlesRepository.GetAsync(assetPair, date)).OrderBy(c=>c.CandleTimestamp).ToArray();
+                var candles = (await _candlesRepository.GetAsync(assetPair.AssetPairId, date))
+                    .OrderBy(c=>c.CandleTimestamp).ToArray();
 
                 if (!candles.Any())
                 {
@@ -116,7 +126,7 @@ namespace Lykke.Service.PayVolatility.Services
                     return false;
                 }
 
-                Volatility volatility = Calculate(candles);
+                Volatility volatility = Calculate(assetPair, candles);
                 await _volatilityRepository.InsertAsync(volatility);
                 await _candlesRepository.DeleteAsync(candles);
                 _log.Info($"Processed {assetPair} {date.ToString("yyyy-MM-dd")} based on {candles.Length} candles.");
@@ -129,7 +139,7 @@ namespace Lykke.Service.PayVolatility.Services
             return true;
         }
 
-        private Volatility Calculate(ICandle[] candles)
+        private Volatility Calculate(AssetPairSettings assetPairSettings, ICandle[] candles)
         {
             var closePriceChanges = new List<double>();
             var highPriceChanges = new List<double>();
@@ -147,16 +157,23 @@ namespace Lykke.Service.PayVolatility.Services
             var closePriceStdev = (decimal)closePriceChanges.StandardDeviation();
             var highPriceStdev = (decimal)highPriceChanges.StandardDeviation();
 
+            AssetPair assetPair = _cachedAssetsService.GetAssetPair(assetPairSettings.AssetPairId);
+
+            decimal closePriceVolatilityShield = Math.Round(assetPairSettings.MultiplierFactor * closePriceStdev,
+                assetPair.Accuracy, MidpointRounding.AwayFromZero);
+            decimal highPriceVolatilityShield = Math.Round(assetPairSettings.MultiplierFactor * highPriceStdev,
+                assetPair.Accuracy, MidpointRounding.AwayFromZero);
+
             var temp = candles.First();
             return new Volatility()
             {
-                AssetPairId = temp.AssetPairId,
+                AssetPairId = assetPairSettings.AssetPairId,
                 Date = temp.CandleTimestamp.Date,
-                MultiplierFactor = _settings.MultiplierFactor,
+                MultiplierFactor = assetPairSettings.MultiplierFactor,
                 ClosePriceStdev = closePriceStdev,
-                ClosePriceVolatilityShield = _settings.MultiplierFactor * closePriceStdev,
+                ClosePriceVolatilityShield = closePriceVolatilityShield,
                 HighPriceStdev = highPriceStdev,
-                HighPriceVolatilityShield = _settings.MultiplierFactor * highPriceStdev
+                HighPriceVolatilityShield = highPriceVolatilityShield
             };
         }
 
