@@ -3,6 +3,7 @@ using AutoMapper;
 using AzureStorage.Tables;
 using Common;
 using Lykke.Common.Log;
+using Lykke.Service.Assets.Client;
 using Lykke.Service.PayVolatility.AzureRepositories.Candles;
 using Lykke.Service.PayVolatility.AzureRepositories.Volatility;
 using Lykke.Service.PayVolatility.Core.Domain;
@@ -31,6 +32,12 @@ namespace Lykke.Service.PayVolatility.Modules
             IMapper mapper = mapperProvider.GetMapper();
             builder.RegisterInstance(mapper).As<IMapper>();
 
+            builder.RegisterAssetsClient(_appSettings.CurrentValue.AssetService);
+            builder.RegisterType<CachedAssetsService>()
+                .As<ICachedAssetsService>()
+                .SingleInstance()
+                .WithParameter("assetPairsSettings", _appSettings.CurrentValue.PayVolatilityService.AssetPairs); ;
+
             builder.Register(c =>
                     new CandlesRepository(AzureTableStorage<CandleEntity>.Create(
                     _appSettings.ConnectionString(x => x.PayVolatilityService.Db.DataConnString),
@@ -53,14 +60,14 @@ namespace Lykke.Service.PayVolatility.Modules
                 .AutoActivate()
                 .SingleInstance()
                 .WithParameter("settings", _appSettings.CurrentValue.PayVolatilityService.TickPricesSubscriber)
-                .WithParameter("assetPairs", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
+                .WithParameter("assetPairsSettings", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
 
             builder.RegisterType<VolatilityCalculator>()
                 .As<IStartable>()
                 .As<IStopable>()
                 .AutoActivate()
                 .SingleInstance()
-                .WithParameter("assetPairs", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
+                .WithParameter("assetPairsSettings", _appSettings.CurrentValue.PayVolatilityService.AssetPairs);
 
             builder.RegisterType<VolatilityService>()
                 .As<IVolatilityService>()

@@ -10,9 +10,7 @@ namespace Lykke.Service.PayVolatility.Core.Settings
         public VolatilityServiceSettings()
         {
             ProcessingHistoryDepthDays = DefaultProcessingHistoryDepthDays;
-        }
-
-        public decimal MultiplierFactor { get; set; }
+        }        
 
         public DateTime CalculateTime { get; set; }
 
