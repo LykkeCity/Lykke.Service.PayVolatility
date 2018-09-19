@@ -117,6 +117,7 @@ namespace Lykke.Service.PayVolatility.Services
 
                 if (!candles.Any())
                 {
+                    _log.Info($"There are no candles to process {assetPair} on {date.ToString("yyyy-MM-dd")}.");
                     return false;
                 }
 
