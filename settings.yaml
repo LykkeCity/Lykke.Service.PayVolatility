@@ -17,14 +17,17 @@ PayVolatilityService:
         QueueName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
     VolatilityService:
-        MultiplierFactor:
-            settings-key: PayVolatilityService-MultiplierFactor
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
     AssetPairs: 
-        settings-key: PayVolatilityService-AssetPairs
+        settings-key: PayVolatilityService-AssetPairsWithMultiplierFactor
         types: [ JsonArray ]
 
+AssetService:  
+    ServiceUrl:
+        settings-key: AssetsServiceUrl
+        types: [ Tag ]        
+        
 MonitoringServiceClient:
   MonitoringServiceUrl:
     settings-key: MonitoringServiceUrl
