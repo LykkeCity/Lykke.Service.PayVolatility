@@ -160,9 +160,9 @@ namespace Lykke.Service.PayVolatility.Services
 
             AssetPair assetPair = _cachedAssetsService.GetAssetPair(assetPairSettings.AssetPairId);
 
-            decimal closePriceVolatilityShield = Math.Round(assetPairSettings.MultiplierFactor * closePriceStdev,
+            decimal closePriceVolatilityShieldPercentage = Math.Round(assetPairSettings.MultiplierFactor * closePriceStdev * 100,
                 assetPair.Accuracy, MidpointRounding.AwayFromZero);
-            decimal highPriceVolatilityShield = Math.Round(assetPairSettings.MultiplierFactor * highPriceStdev,
+            decimal highPriceVolatilityShieldPercentage = Math.Round(assetPairSettings.MultiplierFactor * highPriceStdev * 100,
                 assetPair.Accuracy, MidpointRounding.AwayFromZero);
 
             var temp = candles.First();
@@ -172,9 +172,9 @@ namespace Lykke.Service.PayVolatility.Services
                 Date = temp.CandleTimestamp.Date,
                 MultiplierFactor = assetPairSettings.MultiplierFactor,
                 ClosePriceStdev = closePriceStdev,
-                ClosePriceVolatilityShield = closePriceVolatilityShield,
+                ClosePriceVolatilityShield = closePriceVolatilityShieldPercentage,
                 HighPriceStdev = highPriceStdev,
-                HighPriceVolatilityShield = highPriceVolatilityShield
+                HighPriceVolatilityShield = highPriceVolatilityShieldPercentage
             };
         }
 
