@@ -1,4 +1,4 @@
-PayVolatilityService:
+PayVolatilityService: 
     Db:
         LogsConnString:
             settings-key: LykkePayLogsConnString
@@ -11,18 +11,14 @@ PayVolatilityService:
     TickPricesSubscriber:
         ConnectionString: 
             settings-key: RabbitRawExchanges
-            types: [ RabbitMq, Tag ]
+            types: [ RabbitMq ]
         ExchangeName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-ExchangeName
-            types: [ Tag ]
         QueueName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
-            types: [ Tag ]
     VolatilityService:
-            types: [ Tag ]
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
-            types: [ Tag ]
     AssetPairs: 
         settings-key: PayVolatilityService-AssetPairsWithMultiplierFactor
         types: [ JsonArray, Tag ]
@@ -33,15 +29,14 @@ AssetService:
         types: [ Tag ]        
         
 MonitoringServiceClient:
-    MonitoringServiceUrl:
-        settings-key: MonitoringServiceUrl
-        types: [ Tag ]
+  MonitoringServiceUrl:
+    settings-key: MonitoringServiceUrl
 
 SlackNotifications:
-    AzureQueue:
-        ConnectionString:
-            settings-key: SlackNotificationsConnString
-            types: [ AzureTableStorage ]
-        QueueName:
-            settings-key: SlackQueueName
-            types: [ AzureTableStorage ]
+  AzureQueue:
+    ConnectionString:
+      settings-key: SlackNotificationsConnString
+      types: [ AzureTableStorage ]
+    QueueName:
+      settings-key: SlackQueueName
+      types: [ AzureTableStorage ]
