@@ -4,7 +4,7 @@ PayVolatilityService:
             settings-key: LykkePayLogsConnString
             types: [ AzureTableStorage ]
         DataConnString: 
-            settings-key: LykkePayDataConnString
+            settings-key: LykkePayVolatilityDataConnString
             types: [ AzureTableStorage ]
         CandlesTableName: VolatilityCandles
         VolatilityTableName: Volatility
