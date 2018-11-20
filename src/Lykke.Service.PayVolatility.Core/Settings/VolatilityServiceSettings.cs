@@ -1,10 +1,20 @@
 ﻿using System;
+using Lykke.SettingsReader.Attributes;
 
 namespace Lykke.Service.PayVolatility.Core.Settings
 {
     public class VolatilityServiceSettings
     {
-        public decimal MultiplierFactor { get; set; }
+        private const int DefaultProcessingHistoryDepthDays = 7;
+
+        public VolatilityServiceSettings()
+        {
+            ProcessingHistoryDepthDays = DefaultProcessingHistoryDepthDays;
+        }        
+
         public DateTime CalculateTime { get; set; }
+
+        [Optional]
+        public int ProcessingHistoryDepthDays { get; set; }
     }
 }

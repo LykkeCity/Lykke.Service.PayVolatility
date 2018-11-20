@@ -4,9 +4,9 @@ PayVolatilityService:
             settings-key: LykkePayLogsConnString
             types: [ AzureTableStorage, Tag ]
         DataConnString: 
-            settings-key: LykkePayMerchantDataConnString
+            settings-key: LykkePayVolatilityDataConnString
             types: [ AzureTableStorage, Tag ]
-        CandlesTableName: Candles
+        CandlesTableName: VolatilityCandles
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
@@ -19,16 +19,19 @@ PayVolatilityService:
             settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
             types: [ Tag ]
     VolatilityService:
-        MultiplierFactor:
-            settings-key: PayVolatilityService-MultiplierFactor
             types: [ Tag ]
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime
             types: [ Tag ]
     AssetPairs: 
-        settings-key: PayVolatilityService-AssetPairs
+        settings-key: PayVolatilityService-AssetPairsWithMultiplierFactor
         types: [ JsonArray, Tag ]
 
+AssetService:  
+    ServiceUrl:
+        settings-key: AssetsServiceUrl
+        types: [ Tag ]        
+        
 MonitoringServiceClient:
     MonitoringServiceUrl:
         settings-key: MonitoringServiceUrl
