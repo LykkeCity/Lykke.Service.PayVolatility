@@ -10,12 +10,10 @@ PayVolatilityService:
         VolatilityTableName: Volatility
     TickPricesSubscriber:
         ConnectionString: 
-            settings-key: RabbitRawExchanges
+            settings-key: RawPriceRabbitMq
             types: [ RabbitMq ]
         ExchangeName: 
             settings-key: PayVolatilityService-TickPriceSubscriber-ExchangeName
-        QueueName: 
-            settings-key: PayVolatilityService-TickPriceSubscriber-QueueName
     VolatilityService:
         CalculateTime: 
             settings-key: PayVolatilityService-CalculateTime

@@ -37,13 +37,11 @@ namespace Lykke.Service.PayVolatility.Rabbit
 
         public void Start()
         {
-            var settings = new RabbitMqSubscriptionSettings
-            {
-                ConnectionString = _settings.ConnectionString,
-                QueueName = _settings.QueueName,
-                ExchangeName = _settings.ExchangeName,
-                IsDurable = false
-            };
+            var settings = RabbitMqSubscriptionSettings
+                .ForSubscriber(
+                    _settings.ConnectionString, 
+                    _settings.ExchangeName, 
+                    nameof(PayVolatility));
 
             _subscriber = new RabbitMqSubscriber<TickPrice>(
                     _logFactory,
